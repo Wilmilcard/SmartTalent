@@ -8,21 +8,20 @@ using System.Threading.Tasks;
 
 namespace SmartTalent.Domain.Models
 {
-    [Table("Hotel")]
-    public class Hotel : Auditory
+    [Table("Favorites")]
+    public class Favorites : Auditory
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
-        [Column("HotelId")]
-        public int HotelId { get; set; }
-
-        public string Name { get; set; }
-        public bool Availability { get; set; }
+        [Column("FavoritesId")]
+        public int FavoritesId { get; set; }
 
         //Foreing Key
-        public int CityId { get; set; }
+        public int RoomId { get; set; }
+        public int PersonId { get; set; }
 
         //Virtuals
-        public virtual City City { get; set; }
+        public virtual Room Room { get; set; }
+        public virtual Person Person { get; set; }
     }
 }

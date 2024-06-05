@@ -15,6 +15,6 @@ namespace SmartTalent.Domain.Models
         [Key]
         [Column("CityId")]
         public int CityId { get; set; }
-        public int Name { get; set; }
+        public string Name { get; set; }
     }
 }

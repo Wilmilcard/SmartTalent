@@ -16,7 +16,8 @@ namespace SmartTalent.Domain.Models
         [Column("DocTypeId")]
         public int DocTypeId { get; set; }
 
-        [StringLength(20)]
+        [StringLength(25)]
         public string Name { get; set; }
+        public string type { get; set; }
     }
 }

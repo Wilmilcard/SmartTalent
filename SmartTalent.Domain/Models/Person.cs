@@ -16,12 +16,12 @@ namespace SmartTalent.Domain.Models
         [Column("PersonId")]
         public int PersonId { get; set; }
 
-        [StringLength(100)]
-        [Column(TypeName = "VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci")]
-        public string Name { get; set; }
+        [StringLength(150)]
+        [Column(TypeName = "VARCHAR(150) CHARACTER SET utf8 COLLATE utf8_unicode_ci")]
+        public string FirstName { get; set; }
         
-        [StringLength(100)]
-        [Column(TypeName = "VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci")]
+        [StringLength(150)]
+        [Column(TypeName = "VARCHAR(150) CHARACTER SET utf8 COLLATE utf8_unicode_ci")]
         public string LastName { get; set; }
 
         [Column("Birth")]
@@ -31,14 +31,12 @@ namespace SmartTalent.Domain.Models
         public char Gender { get; set; }
 
         [Column("Document")]
-        public char Document { get; set; }
+        public string Document { get; set; }
 
         [Column("Email")]
-        [StringLength(100)]
         public string Email { get; set; }
 
         [Column("Phone")]
-        [StringLength(30)]
         public string Phone { get; set; }
         
         public string EmergencyContact { get; set; }

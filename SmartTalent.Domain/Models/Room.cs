@@ -16,8 +16,7 @@ namespace SmartTalent.Domain.Models
         [Column("RoomId")]
         public int RoomId { get; set; }
 
-        [Column("Room_Number")]
-        [StringLength(5)]
+        [Column("RoomNumber")]
         public string RoomNumber { get; set; }
         public bool Availability { get; set; }
         public int MaxGuest { get; set; }

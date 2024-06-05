@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SmartTalent.Domain.Models;
+using SmartTalent.Domain.Seed;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,8 +15,10 @@ namespace SmartTalent.Domain.DB
     {
         public SmartTalentContext(DbContextOptions<SmartTalentContext> options) : base(options) { }
 
+        public DbSet<Booking> Booking { get; set; }
         public DbSet<City> Cities { get; set; }
         public DbSet<DocType> DocTypes { get; set; }
+        public DbSet<Favorites> favorites { get; set; }
         public DbSet<Hotel> Hotels { get; set; }
         public DbSet<Person> Persons { get; set; }
         public DbSet<RolType> RolTypes { get; set; }
@@ -24,7 +27,7 @@ namespace SmartTalent.Domain.DB
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //modelBuilder.Seed();
+            modelBuilder.Seed();
         }
     }
 }

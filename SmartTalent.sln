@@ -5,6 +5,8 @@ VisualStudioVersion = 17.7.34202.233
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartTalent", "SmartTalent\SmartTalent.csproj", "{5AAEBD43-7CAB-4813-9706-4E34C5F190B6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartTalent.Domain", "SmartTalent.Domain\SmartTalent.Domain.csproj", "{DA7B2F2E-276C-43BF-94D0-44BB59A4DE09}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{5AAEBD43-7CAB-4813-9706-4E34C5F190B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5AAEBD43-7CAB-4813-9706-4E34C5F190B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5AAEBD43-7CAB-4813-9706-4E34C5F190B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA7B2F2E-276C-43BF-94D0-44BB59A4DE09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA7B2F2E-276C-43BF-94D0-44BB59A4DE09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA7B2F2E-276C-43BF-94D0-44BB59A4DE09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA7B2F2E-276C-43BF-94D0-44BB59A4DE09}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

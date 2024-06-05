@@ -1,3 +1,9 @@
+using SmartTalent;
+
+var app = Startup.InicializarApp(args);
+/*
+ * 
+ * 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -21,5 +27,8 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+*
+*
+*/
 
 app.Run();

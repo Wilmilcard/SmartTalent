@@ -35,12 +35,38 @@ namespace SmartTalent.Controllers
                     .Include(x => x.Room)
                         .ThenInclude(r => r.Hotel)
                             .ThenInclude(h => h.City)
-                    .Where(x => 
-                        x.StarDate >= request.StarDate
-                        && x.EndDate >= request.EndDate
-                        && x.TotalGuest == request.NumGuest
-                        && x.Room.Hotel.City.CityId == request.CityId)
-                    .ToList();
+                    .Include(x => x.Room)
+                        .ThenInclude(r => r.RoomType)
+                    .Include(x => x.Person)
+                    .Where(x =>
+                        x.Code == request.Code
+                        || x.StarDate >= request.StarDate
+                        || x.EndDate >= request.EndDate
+                        || x.TotalGuest == request.NumGuest
+                        || x.Room.Hotel.City.CityId == request.CityId)
+                    .Select(x => new
+                    {
+                        x.Code,
+                        ReservationBy = $"{x.Person.FirstName} {x.Person.LastName}",
+                        x.Person.Document,
+                        x.Room.Hotel.Name,
+                        x.StarDate,
+                        x.EndDate,
+                        x.TotalGuest,
+                        x.BaseCost,
+                        x.Tax,
+                        x.Total,
+                        room = new
+                        {
+                            x.Room.RoomNumber,
+                            x.Room.MaxGuest,
+                            x.Room.RoomType.Name
+                        },
+                        x.Person.EmergencyContact,
+                        x.Person.EmergencyPhone,
+                        ReservationDate = x.CreatedAt
+                    })
+                    .FirstOrDefault();
 
                 var response = new
                 {
@@ -122,8 +148,22 @@ namespace SmartTalent.Controllers
                     var _baseCost = room.RoomType.ValuePerNight * days;
                     var _tax = _baseCost * Globals.Tax();
 
+                    var rpta = false;
+                    string _code;
+                    do
+                    {
+                        _code = CodeGenerator.GenerateCode(6);
+                        var code_in_db = _context.Booking
+                            .Where(x => x.Code == _code)
+                            .Select(x => x.Code)
+                            .FirstOrDefault();
+
+                        rpta = code_in_db == null;
+                    } while (rpta);
+
                     var book = new Booking
                     {
+                        Code = _code,
                         StarDate = request.StarDate,
                         EndDate = request.EndDate,
                         Availability = false,

@@ -25,6 +25,7 @@ namespace SmartTalent.Controllers
         {
             try
             {
+                var random = new Random();
                 var bookings = _context.Booking.AsNoTracking().ToList();
 
                 foreach (var b in bookings)
@@ -36,6 +37,7 @@ namespace SmartTalent.Controllers
                     b.BaseCost = room.RoomType.ValuePerNight * days;
                     b.Tax = b.BaseCost * Globals.Tax();
                     b.Total = b.BaseCost + b.Tax;
+                    b.TotalGuest = random.Next(1, room.MaxGuest);
 
                     _context.Booking.Update(b);
                     _context.SaveChanges();

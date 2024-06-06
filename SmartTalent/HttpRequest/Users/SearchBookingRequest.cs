@@ -2,6 +2,7 @@
 {
     public class SearchBookingRequest
     {
+        public string Code { get; set; }
         public DateTime StarDate { get; set; }
         public DateTime EndDate { get; set; }
         public int NumGuest { get; set; }

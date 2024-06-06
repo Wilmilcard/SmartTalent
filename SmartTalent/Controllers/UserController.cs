@@ -16,12 +16,14 @@ namespace SmartTalent.Controllers
     public class UserController : ControllerBase
     {
         private readonly IBookingServices _bookingService;
+        private readonly IRoomServices _roomServices;
         private readonly IConfiguration Configuration;
         private readonly SmartTalentContext _context;
 
-        public UserController(IBookingServices bookingService, IConfiguration configuration, SmartTalentContext context)
+        public UserController(IBookingServices bookingService, IRoomServices roomServices, IConfiguration configuration, SmartTalentContext context)
         {
             _bookingService = bookingService;
+            _roomServices = roomServices;
             Configuration = configuration;
             _context = context;
         }
@@ -87,7 +89,7 @@ namespace SmartTalent.Controllers
             }
         }
 
-        [HttpGet("[Action]")]
+        [HttpPost("[Action]")]
         public async Task<IActionResult> GetRooms([FromBody] RoomSearchRequest request)
         {
             try
@@ -97,11 +99,27 @@ namespace SmartTalent.Controllers
                 if (request.CityId <= 0)
                     return new BadRequestObjectResult(new { success = false, data = "No ha seleccionado ciudad" });
 
-                var query = _context.Rooms
-                    .Include(x => x.Hotel)
+                var query = _bookingService.QueryNoTracking()
+                    .Include(x => x.Person)
+                    .Include(x => x.Room)
+                        .ThenInclude(r => r.Hotel)
+                            .ThenInclude(h => h.City)
+                    .Include(x => x.Room)
+                        .ThenInclude(r => r.RoomType)
                     .Where(x =>
-                        x.HotelId == request.HotelId
-                        && x.Hotel.CityId == request.CityId)
+                        x.Room.HotelId == request.HotelId
+                        || x.Room.Hotel.CityId == request.CityId)
+                    .Select(x => new
+                    {
+                        x.Room.RoomNumber,
+                        x.StarDate,
+                        x.EndDate,
+                        x.Room.Hotel.Name,
+                        x.Room.MaxGuest,
+                        x.Room.Availability,
+                        RoomType = x.Room.RoomType.Name,
+                        City = x.Room.Hotel.City.Name
+                    })
                     .ToList();
 
                 var response = new
@@ -133,15 +151,17 @@ namespace SmartTalent.Controllers
                 if (request.StarDate >= request.EndDate || request.EndDate <= request.StarDate)
                     return new BadRequestObjectResult(new { success = false, data = "Hay un error al seleccionar las fechas" });
 
-                var max_guest = _context.Rooms.Where(x => x.RoomId == request.RoomId).Select(x => x.MaxGuest).FirstOrDefault();
-                if (request.Guests.Count > max_guest)
+                var _room = _context.Rooms.Where(x => x.RoomId == request.RoomId).Select(x => new { x.MaxGuest, x.Availability }).FirstOrDefault();
+                if (request.Guests.Count > _room.MaxGuest)
                     return new BadRequestObjectResult(new { success = false, data = "Supera la cantidad de huespedes que permite la habitación" });
+                if (!_room.Availability)
+                    return new BadRequestObjectResult(new { success = false, data = "La habitación no esta disponible" });
 
                 string _reservation;
 
                 using (var transaction = _context.Database.BeginTransaction())
                 {
-                    var room = _context.Rooms.Where(x => x.RoomId == request.RoomId).FirstOrDefault();
+                    var room = _context.Rooms.Include(x => x.RoomType).Where(x => x.RoomId == request.RoomId).FirstOrDefault();
                     var days = request.EndDate.Day - request.StarDate.Day;
                     if (days <= 0) days *= -1;
 
@@ -159,7 +179,7 @@ namespace SmartTalent.Controllers
                             .FirstOrDefault();
 
                         rpta = code_in_db == null;
-                    } while (rpta);
+                    } while (!rpta);
 
                     var book = new Booking
                     {
@@ -172,7 +192,7 @@ namespace SmartTalent.Controllers
                         Tax = _baseCost * _tax,
                         Total = _baseCost + _tax,
                         RoomId = request.RoomId,
-                        //PersonId = 
+                        PersonId = 1,
                         CreatedAt = Globals.ActualDate(),
                         CreatedBy = Globals.UserSystem()
                     };
@@ -203,8 +223,12 @@ namespace SmartTalent.Controllers
                     foreach(var g in request.Guests)
                     {
                         if (g.IsPrincipalGuest)
-                            Console.WriteLine("");
+                            EmailTools.SendEmails("", _reservation);
                     }
+
+                    room.Availability = false;
+                    room.UpdatedAt = Globals.ActualDate();
+                    await _roomServices.UpdateAsync(room);
 
                     _context.SaveChanges();
                     transaction.Commit();

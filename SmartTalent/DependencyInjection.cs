@@ -9,6 +9,7 @@ namespace SmartTalent
         {
             services.AddScoped<IHotelServices, HotelServices>();
             services.AddScoped<IBookingServices, BookingServices>();
+            services.AddScoped<IRoomServices, RoomServices>();
 
             return services;
         }

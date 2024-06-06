@@ -27,6 +27,8 @@ namespace SmartTalent
 
             //Dependencias de Domain
             builder.Services.AddCustomizedDataStore(configuration);
+            builder.Services.AddCustomizedServicesProject();
+            builder.Services.AddCustomizedRepository();
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
@@ -55,7 +57,7 @@ namespace SmartTalent
 
             app.UseAuthorization();
 
-            //app.UseCors("Policy");
+            app.UseCors("Policy");
 
             app.MapControllers();
         }

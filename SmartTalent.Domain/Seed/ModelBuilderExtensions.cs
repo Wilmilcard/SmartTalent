@@ -154,7 +154,7 @@ namespace SmartTalent.Domain.Seed
             id = 1;
             var fakerHotel = new Bogus.Faker<Hotel>()
                 .RuleFor(x => x.HotelId, f => id++)
-                .RuleFor(x => x.Name, f => f.Address.StreetName())
+                .RuleFor(x => x.Name, f => $"Hotel {f.Address.StreetName()}")
                 .RuleFor(x => x.Availability, f => f.Random.Bool())
                 .RuleFor(x => x.CityId, f => f.Random.Number(1,5))
                 .RuleFor(x => x.CreatedAt, _CreatedAt)
@@ -170,7 +170,7 @@ namespace SmartTalent.Domain.Seed
 
             var fakerRoom = new Bogus.Faker<Room>()
                 .RuleFor(x => x.RoomId, f => id++)
-                .RuleFor(x => x.RoomNumber, f => $"{st.Substring(random.Next(1,26),1).ToUpper()} - {random.Next(99)}")
+                .RuleFor(x => x.RoomNumber, f => $"{st.Substring(random.Next(1,26),1).ToUpper()}{random.Next(99)}")
                 .RuleFor(x => x.Availability, f => f.Random.Bool())
                 .RuleFor(x => x.MaxGuest, f => f.Random.Number(1, 4))
                 .RuleFor(x => x.HotelId, f => f.Random.Number(1, 50))
@@ -222,7 +222,7 @@ namespace SmartTalent.Domain.Seed
             var fakerBooking = new Bogus.Faker<Booking>()
                 .RuleFor(x => x.BookingId, f => id++)
                 .RuleFor(x => x.StarDate, f => startYear.AddDays(random.Next(1, 365)))
-                .RuleFor(x => x.EndDate, (f, x) => x.StarDate.AddDays(random.Next(1, 10)))
+                .RuleFor(x => x.EndDate, (f, x) => x.StarDate.AddDays(random.Next(2, 10)))
                 .RuleFor(x => x.Availability, f => f.Random.Bool())
                 .RuleFor(x => x.RoomId, f => f.Random.Number(1, 150))
                 .RuleFor(x => x.PersonId, f => f.Random.Number(1, 400))

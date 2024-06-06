@@ -18,9 +18,9 @@ namespace SmartTalent.Domain.Models
         public DateTime StarDate { get; set; }
         public DateTime EndDate { get; set; }
         public bool Availability { get; set; }
-        public int BaseCost { get; set; }
-        public int Tax { get; set; }
-        public int Total { get; set; }
+        public double BaseCost { get; set; }
+        public double Tax { get; set; }
+        public double Total { get; set; }
 
         //Foreing Key
         public int RoomId { get; set; }

@@ -46,6 +46,7 @@ namespace SmartTalent.Controllers
                         || x.EndDate >= request.EndDate
                         || x.TotalGuest == request.NumGuest
                         || x.Room.Hotel.City.CityId == request.CityId)
+                    .OrderByDescending(x => x.CreatedAt)
                     .Select(x => new
                     {
                         x.Code,
@@ -151,7 +152,7 @@ namespace SmartTalent.Controllers
                 if (request.StarDate >= request.EndDate || request.EndDate <= request.StarDate)
                     return new BadRequestObjectResult(new { success = false, data = "Hay un error al seleccionar las fechas" });
 
-                var _room = _context.Rooms.Where(x => x.RoomId == request.RoomId).Select(x => new { x.MaxGuest, x.Availability }).FirstOrDefault();
+                var _room = _roomServices.QueryNoTracking().Where(x => x.RoomId == request.RoomId).Select(x => new { x.MaxGuest, x.Availability }).FirstOrDefault();
                 if (request.Guests.Count > _room.MaxGuest)
                     return new BadRequestObjectResult(new { success = false, data = "Supera la cantidad de huespedes que permite la habitación" });
                 if (!_room.Availability)
@@ -161,7 +162,7 @@ namespace SmartTalent.Controllers
 
                 using (var transaction = _context.Database.BeginTransaction())
                 {
-                    var room = _context.Rooms.Include(x => x.RoomType).Where(x => x.RoomId == request.RoomId).FirstOrDefault();
+                    var room = _roomServices.QueryNoTracking().Include(x => x.RoomType).Where(x => x.RoomId == request.RoomId).FirstOrDefault();
                     var days = request.EndDate.Day - request.StarDate.Day;
                     if (days <= 0) days *= -1;
 
@@ -211,6 +212,7 @@ namespace SmartTalent.Controllers
                             Document = g.Document,
                             Email = g.Email,
                             Phone = g.Phone,
+                            RolTypeId = 2,
                             EmergencyContact = request.EmergencyContact,
                             EmergencyPhone = request.EmergencyPhone,
                             CreatedAt = Globals.ActualDate(),

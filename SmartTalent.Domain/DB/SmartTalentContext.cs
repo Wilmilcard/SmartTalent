@@ -21,6 +21,7 @@ namespace SmartTalent.Domain.DB
         public DbSet<Favorites> favorites { get; set; }
         public DbSet<Hotel> Hotels { get; set; }
         public DbSet<Person> Persons { get; set; }
+        public DbSet<PersonBooking> PersonBookings { get; set; }
         public DbSet<RolType> RolTypes { get; set; }
         public DbSet<Room> Rooms { get; set; }
         public DbSet<RoomType> RoomTypes { get; set; }

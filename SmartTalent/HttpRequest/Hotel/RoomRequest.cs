@@ -1,4 +1,4 @@
-﻿namespace SmartTalent.HttpRequest
+﻿namespace SmartTalent.HttpRequest.Hotel
 {
     public class RoomRequest
     {

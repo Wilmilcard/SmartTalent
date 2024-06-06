@@ -8,6 +8,7 @@ namespace SmartTalent
         public static IServiceCollection AddCustomizedServicesProject(this IServiceCollection services)
         {
             services.AddScoped<IHotelServices, HotelServices>();
+            services.AddScoped<IBookingServices, BookingServices>();
 
             return services;
         }

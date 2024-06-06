@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SmartTalent.Domain.DB;
 using SmartTalent.Domain.Models;
-using SmartTalent.HttpRequest;
+using SmartTalent.HttpRequest.Hotel;
 using SmartTalent.Interfaces;
 using SmartTalent.Utils;
 using System.Diagnostics;

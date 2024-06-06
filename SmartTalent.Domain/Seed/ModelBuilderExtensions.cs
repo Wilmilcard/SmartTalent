@@ -160,7 +160,7 @@ namespace SmartTalent.Domain.Seed
                 .RuleFor(x => x.CreatedAt, _CreatedAt)
                 .RuleFor(x => x.CreatedBy, _CratedBy);
 
-            foreach (var h in fakerHotel.Generate(50))
+            foreach (var h in fakerHotel.Generate(25))
                 modelBuilder.Entity<Hotel>().HasData(h);
             #endregion
 
@@ -173,12 +173,12 @@ namespace SmartTalent.Domain.Seed
                 .RuleFor(x => x.RoomNumber, f => $"{st.Substring(random.Next(1,26),1).ToUpper()}{random.Next(99)}")
                 .RuleFor(x => x.Availability, f => f.Random.Bool())
                 .RuleFor(x => x.MaxGuest, f => f.Random.Number(1, 4))
-                .RuleFor(x => x.HotelId, f => f.Random.Number(1, 50))
+                .RuleFor(x => x.HotelId, f => f.Random.Number(1, 25))
                 .RuleFor(x => x.RoomTypeId, f => f.Random.Number(1, 3))
                 .RuleFor(x => x.CreatedAt, _CreatedAt)
                 .RuleFor(x => x.CreatedBy, _CratedBy);
 
-            foreach (var r in fakerRoom.Generate(150))
+            foreach (var r in fakerRoom.Generate(100))
                 modelBuilder.Entity<Room>().HasData(r);
             #endregion
 
@@ -200,7 +200,7 @@ namespace SmartTalent.Domain.Seed
                 .RuleFor(x => x.CreatedAt, _CreatedAt)
                 .RuleFor(x => x.CreatedBy, _CratedBy);
 
-            foreach (var p in fakerPerson.Generate(400))
+            foreach (var p in fakerPerson.Generate(100))
                 modelBuilder.Entity<Person>().HasData(p);
             #endregion
 
@@ -208,8 +208,8 @@ namespace SmartTalent.Domain.Seed
             id = 1;
             var fakerFavorite = new Bogus.Faker<Favorites>()
                 .RuleFor(x => x.FavoritesId, f => id++)
-                .RuleFor(x => x.RoomId, f => f.Random.Number(1, 150))
-                .RuleFor(x => x.PersonId, f => f.Random.Number(1, 400))
+                .RuleFor(x => x.RoomId, f => f.Random.Number(1, 100))
+                .RuleFor(x => x.PersonId, f => f.Random.Number(1, 100))
                 .RuleFor(x => x.CreatedAt, _CreatedAt)
                 .RuleFor(x => x.CreatedBy, _CratedBy);
 
@@ -221,16 +221,30 @@ namespace SmartTalent.Domain.Seed
             id = 1;
             var fakerBooking = new Bogus.Faker<Booking>()
                 .RuleFor(x => x.BookingId, f => id++)
+                .RuleFor(x => x.Code, f => f.Finance.Bic().ToUpper().Substring(1,6))
                 .RuleFor(x => x.StarDate, f => startYear.AddDays(random.Next(1, 365)))
                 .RuleFor(x => x.EndDate, (f, x) => x.StarDate.AddDays(random.Next(2, 10)))
                 .RuleFor(x => x.Availability, f => f.Random.Bool())
-                .RuleFor(x => x.RoomId, f => f.Random.Number(1, 150))
-                .RuleFor(x => x.PersonId, f => f.Random.Number(1, 400))
+                .RuleFor(x => x.RoomId, f => f.Random.Number(1, 100))
+                .RuleFor(x => x.PersonId, f => f.Random.Number(1, 100))
                 .RuleFor(x => x.CreatedAt, _CreatedAt)
                 .RuleFor(x => x.CreatedBy, _CratedBy);
 
             foreach (var b in fakerBooking.Generate(100))
                 modelBuilder.Entity<Booking>().HasData(b);
+            #endregion
+
+            #region PersonBooking
+            id = 1;
+            var fakerPersonBooking = new Bogus.Faker<PersonBooking>()
+                .RuleFor(x => x.PersonBookingId, f => id++)
+                .RuleFor(x => x.BookingId, f => f.Random.Number(1, 100))
+                .RuleFor(x => x.PersonId, f => f.Random.Number(1, 100))
+                .RuleFor(x => x.CreatedAt, _CreatedAt)
+                .RuleFor(x => x.CreatedBy, _CratedBy);
+
+            foreach (var pb in fakerPersonBooking.Generate(250))
+                modelBuilder.Entity<PersonBooking>().HasData(pb);
             #endregion
         }
     }

@@ -15,9 +15,12 @@ namespace SmartTalent.Domain.Models
         [Key]
         [Column("BookingId")]
         public int BookingId { get; set; }
+        [StringLength(6)]
+        public string Code { get; set; }
         public DateTime StarDate { get; set; }
         public DateTime EndDate { get; set; }
         public bool Availability { get; set; }
+        public double TotalGuest { get; set; }
         public double BaseCost { get; set; }
         public double Tax { get; set; }
         public double Total { get; set; }

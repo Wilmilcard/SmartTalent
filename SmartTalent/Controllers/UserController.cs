@@ -35,6 +35,9 @@ namespace SmartTalent.Controllers
         {
             try
             {
+                var claims = User.Claims.FirstOrDefault();
+                var person = _context.Persons.Include(x => x.User).Where(x => x.User.Username == claims.Value).FirstOrDefault();
+
                 var query = _bookingService.QueryNoTracking()
                     .Include(x => x.Room)
                         .ThenInclude(r => r.Hotel)
@@ -47,7 +50,8 @@ namespace SmartTalent.Controllers
                         || x.StarDate >= request.StarDate
                         || x.EndDate >= request.EndDate
                         || x.TotalGuest == request.NumGuest
-                        || x.Room.Hotel.City.CityId == request.CityId)
+                        || x.Room.Hotel.City.CityId == request.CityId
+                        && x.PersonId == person.PersonId)
                     .OrderByDescending(x => x.CreatedAt)
                     .Select(x => new
                     {
@@ -65,7 +69,8 @@ namespace SmartTalent.Controllers
                         {
                             x.Room.RoomNumber,
                             x.Room.MaxGuest,
-                            x.Room.RoomType.Name
+                            x.Room.RoomType.Name,
+                            Guests = _context.PersonBookings.Include(p => p.Person).Where(p => p.BookingId == x.BookingId).Select(p => new { name = $"{p.Person.FirstName} {p.Person.LastName}" , p.Person.Document, p.Person.Email }).ToList()
                         },
                         x.Person.EmergencyContact,
                         x.Person.EmergencyPhone,
@@ -199,10 +204,10 @@ namespace SmartTalent.Controllers
                         Availability = false,
                         TotalGuest = request.Guests.Count,
                         BaseCost = _baseCost,
-                        Tax = _baseCost * _tax,
+                        Tax = _tax,
                         Total = _baseCost + _tax,
                         RoomId = request.RoomId,
-                        PersonId = 1,
+                        PersonId = person.PersonId,
                         CreatedAt = Globals.ActualDate(),
                         CreatedBy = person.User.Username
                     };
@@ -229,9 +234,20 @@ namespace SmartTalent.Controllers
                         };
 
                         _context.Persons.Add(_guest);
+                        _context.SaveChanges();
+
+                        var _person_booking = new PersonBooking
+                        {
+                            BookingId = book.BookingId,
+                            PersonId = _guest.PersonId,
+                            CreatedAt = Globals.ActualDate(),
+                            CreatedBy = person.User.Username
+                        };
+                        _context.PersonBookings.Add(_person_booking);
+                        _context.SaveChanges();
                     }
 
-                    foreach(var g in request.Guests)
+                    foreach (var g in request.Guests)
                     {
                         if (g.IsPrincipalGuest)
                             EmailTools.SendEmails("", _reservation);

@@ -45,10 +45,12 @@ namespace SmartTalent.Domain.Models
         //Foreing Key
         public int DocTypeId { get; set; }
         public int RolTypeId { get; set; }
+        public int? UserId { get; set; }
 
         //Virtuals
         public virtual DocType DocType { get; set; }
         public virtual RolType RolType { get; set; }
+        public virtual User User { get; set; }
 
     }
 }

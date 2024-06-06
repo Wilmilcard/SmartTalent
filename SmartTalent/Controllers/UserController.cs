@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ namespace SmartTalent.Controllers
 {
     [Route("api/[controller]")]
     [EnableCors("Policy")]
+    [Authorize]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -95,6 +97,9 @@ namespace SmartTalent.Controllers
         {
             try
             {
+                var claims = User.Claims.FirstOrDefault();
+                var person = _context.Persons.Include(x => x.User).Where(x => x.User.Username == claims.Value).FirstOrDefault();
+
                 if (request.HotelId <= 0)
                     return new BadRequestObjectResult(new { success = false, data = "No ha seleccionado un hotel" });
                 if (request.CityId <= 0)
@@ -109,7 +114,8 @@ namespace SmartTalent.Controllers
                         .ThenInclude(r => r.RoomType)
                     .Where(x =>
                         x.Room.HotelId == request.HotelId
-                        || x.Room.Hotel.CityId == request.CityId)
+                        || x.Room.Hotel.CityId == request.CityId
+                        && x.PersonId == person.PersonId)
                     .Select(x => new
                     {
                         x.Room.RoomNumber,
@@ -147,6 +153,9 @@ namespace SmartTalent.Controllers
         {
             try
             {
+                var claims = User.Claims.FirstOrDefault();
+                var person = _context.Persons.Include(x => x.User).Where(x => x.User.Username == claims.Value).FirstOrDefault();
+
                 if (request.RoomId <= 0)
                     return new BadRequestObjectResult(new { success = false, data = "No ha seleccionado una habitacion" });
                 if (request.StarDate >= request.EndDate || request.EndDate <= request.StarDate)
@@ -195,7 +204,7 @@ namespace SmartTalent.Controllers
                         RoomId = request.RoomId,
                         PersonId = 1,
                         CreatedAt = Globals.ActualDate(),
-                        CreatedBy = Globals.UserSystem()
+                        CreatedBy = person.User.Username
                     };
                     await _bookingService.AddAsync(book);
                     _reservation = book.Code;
@@ -216,7 +225,7 @@ namespace SmartTalent.Controllers
                             EmergencyContact = request.EmergencyContact,
                             EmergencyPhone = request.EmergencyPhone,
                             CreatedAt = Globals.ActualDate(),
-                            CreatedBy = Globals.UserSystem()
+                            CreatedBy = person.User.Username
                         };
 
                         _context.Persons.Add(_guest);

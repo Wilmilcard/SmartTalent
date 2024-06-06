@@ -1,6 +1,7 @@
 ﻿using Bogus.Extensions.Sweden;
 using Microsoft.EntityFrameworkCore;
 using SmartTalent.Domain.Models;
+using SmartTalent.Domain.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -246,6 +247,70 @@ namespace SmartTalent.Domain.Seed
 
             foreach (var pb in fakerPersonBooking.Generate(250))
                 modelBuilder.Entity<PersonBooking>().HasData(pb);
+            #endregion
+
+            #region Admins System
+            modelBuilder.Entity<User>().HasData(
+              new User
+              {
+                  UserId = 1,
+                  Username = "ADMIN",
+                  PasswordHash = Encrypt.MD5("1234"),
+                  AccessFailCount = 0,
+                  IsAdmin = true,
+                  IsActive = true,
+                  CreatedAt = _CreatedAt,
+                  CreatedBy = _CratedBy
+              },
+              new User
+              {
+                  UserId = 2,
+                  Username = "SMART",
+                  PasswordHash = Encrypt.MD5("1234"),
+                  AccessFailCount = 0,
+                  IsAdmin = false,
+                  IsActive = true,
+                  CreatedAt = _CreatedAt,
+                  CreatedBy = _CratedBy
+              });
+
+            modelBuilder.Entity<Person>().HasData(
+              new Person
+              {
+                  PersonId = 101,
+                  FirstName = "Administrador",
+                  LastName = "Sistema",
+                  Birth = _CreatedAt.AddYears(-20),
+                  DocTypeId = 1,
+                  Document = "1010101010",
+                  Email = "admin@email.com",
+                  EmergencyContact = "N/A",
+                  EmergencyPhone = "N/A",
+                  Gender = 'M',
+                  Phone = "10101010101",
+                  RolTypeId = 1,
+                  UserId = 1,
+                  CreatedAt = _CreatedAt,
+                  CreatedBy = _CratedBy
+              },
+              new Person
+              {
+                  PersonId = 102,
+                  FirstName = "Smart",
+                  LastName = "Talent",
+                  Birth = _CreatedAt.AddYears(-35).AddMonths(-6).AddDays(-35),
+                  DocTypeId = 3,
+                  Document = "102102120102",
+                  Email = "smart@email.com",
+                  EmergencyContact = "N/A",
+                  EmergencyPhone = "N/A",
+                  Gender = 'F',
+                  Phone = "102102102102",
+                  RolTypeId = 2,
+                  UserId = 2,
+                  CreatedAt = _CreatedAt,
+                  CreatedBy = _CratedBy
+              });
             #endregion
         }
     }

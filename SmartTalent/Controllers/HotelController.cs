@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SmartTalent.Domain.DB;
 using SmartTalent.Domain.Models;
 using SmartTalent.HttpRequest.Hotel;
@@ -12,6 +14,7 @@ namespace SmartTalent.Controllers
 {
     [Route("api/[controller]")]
     [EnableCors("Policy")]
+    [Authorize]
     [ApiController]
     public class HotelController : ControllerBase
     {
@@ -128,9 +131,14 @@ namespace SmartTalent.Controllers
             {
                 using (var transaction = _context.Database.BeginTransaction())
                 {
+                    var claims = User.Claims.FirstOrDefault();
+                    var person = _context.Persons.Include(x => x.User).Where(x => x.User.Username == claims.Value).FirstOrDefault();
+
+                    if (person.RolTypeId == 2 || !person.User.IsAdmin)
+                        return BadRequest(new { success = false, error = 401, content = "No esta autorizado registrar información de hoteles" });
 
                     if (string.IsNullOrEmpty(request.Name))
-                        return new BadRequestObjectResult(new { success = false, data = "El campo NAME esta vacio" });
+                        return new BadRequestObjectResult(new { success = false, data = "El campo nombre esta vacio" });
                     if (request.CityId <= 0)
                         return new BadRequestObjectResult(new { success = false, data = "No ha seleccionado ciudad" });
 
@@ -143,7 +151,7 @@ namespace SmartTalent.Controllers
                         Name = request.Name,
                         CityId = request.CityId,
                         CreatedAt = Globals.ActualDate(),
-                        CreatedBy = Globals.UserSystem() //user.Username
+                        CreatedBy = person.User.Username
                     };
 
                     await _hotelService.AddAsync(newHotel);
@@ -158,7 +166,7 @@ namespace SmartTalent.Controllers
                             HotelId = newHotel.HotelId,
                             RoomTypeId = r.RoomTypeId,
                             CreatedAt = Globals.ActualDate(),
-                            CreatedBy = Globals.UserSystem()
+                            CreatedBy = person.User.Username
                         };
 
                         _context.Rooms.Add(addRoom);
@@ -199,6 +207,11 @@ namespace SmartTalent.Controllers
             {
                 using (var transaction = _context.Database.BeginTransaction())
                 {
+                    var claims = User.Claims.FirstOrDefault();
+                    var person = _context.Persons.Include(x => x.User).Where(x => x.User.Username == claims.Value).FirstOrDefault();
+
+                    if (person.RolTypeId == 2 || !person.User.IsAdmin)
+                        return BadRequest(new { success = false, error = 401, content = "No esta autorizado modificar valores en los tipos de habitación" });
 
                     var roomType = _context.RoomTypes.Where(x => x.RoomTypeId == request.RoomTypeId).FirstOrDefault();
 
@@ -206,6 +219,7 @@ namespace SmartTalent.Controllers
                         return new BadRequestObjectResult(new { success = false, data = "No existe ese Tipo de Habitación" });
 
                     roomType.ValuePerNight = request.Value;
+                    roomType.UpdatedAt = Globals.ActualDate();
                     _context.RoomTypes.Update(roomType);
 
                     _context.SaveChanges();
@@ -243,6 +257,12 @@ namespace SmartTalent.Controllers
             {
                 using (var transaction = _context.Database.BeginTransaction())
                 {
+
+                    var claims = User.Claims.FirstOrDefault();
+                    var person = _context.Persons.Include(x => x.User).Where(x => x.User.Username == claims.Value).FirstOrDefault();
+
+                    if (person.RolTypeId == 2 || !person.User.IsAdmin)
+                        return BadRequest(new { success = false, error = 401, content = "No esta autorizado registrar información de hoteles" });
 
                     var hotel = _hotelService.QueryNoTracking().Where(x => x.HotelId == id).FirstOrDefault();
 
